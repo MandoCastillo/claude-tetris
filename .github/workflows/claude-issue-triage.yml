@@ -37,6 +37,10 @@ jobs:
                  `area: lógica` (colisiones, rotación, líneas, puntaje, niveles),
                  `area: controles` (teclado, pausa, reinicio)
                - tamaño (uno): size/S o size/M
+               - prioridad (uno):
+                 `priority: high` (crash, juego trabado o injugable, pérdida de partida/puntaje),
+                 `priority: medium` (se puede jugar pero afecta la experiencia: control o regla incorrecta, UI confusa),
+                 `priority: low` (cosmético, mejora menor, documentación)
                No crees labels nuevos. Si el issue ya tenía labels que ya no aplican,
                quítalos con `--remove-label`.
             3. Escribe el diagnóstico en español en un archivo y publícalo con
@@ -52,6 +56,7 @@ jobs:
                - **Archivos afectados**
                - **Propuesta de solución** (pasos concretos)
                - **Riesgos / casos borde**
+               - **Prioridad** (high/medium/low) y justificación en una línea
                - **Labels asignados** y por qué
             No modifiques código del repositorio ni abras PRs.
           claude_args: '--allowedTools "Read,Grep,Glob,Write,Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*)"'
