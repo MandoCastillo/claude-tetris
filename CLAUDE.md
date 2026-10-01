@@ -27,4 +27,3 @@ All logic is in `game.js` (single script, global mutable state, `'use strict'`).
 ## Known quirks
 
 - Unpausing doesn't re-add `hidden` to the overlay, so the "PAUSA" overlay stays visible after resuming.
-- When game over is triggered from inside `loop` (gravity lock), `endGame()` cancels the frame but `loop` then schedules a new one, so the loop keeps running after game over.
