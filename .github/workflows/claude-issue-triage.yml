@@ -31,16 +31,24 @@ jobs:
             Repo: ${{ github.repository }}. Issue #${{ github.event.issue.number }}.
             1. Lee el issue con `gh issue view`. Lee CLAUDE.md y el código relevante (game.js, index.html, style.css).
             2. Obtén los labels existentes con `gh label list`. Aplica los que correspondan
-               (tipo: bug/enhancement/documentation/question; tamaño: size/S o size/M)
-               con `gh issue edit --add-label`. No crees labels nuevos. Si el issue ya tenía
-               labels que ya no aplican, quítalos con `--remove-label`.
+               con `gh issue edit --add-label`:
+               - tipo (uno): bug/enhancement/documentation/question
+               - área (uno o más): `area: ui` (renderizado, colores, HTML/CSS, overlay),
+                 `area: lógica` (colisiones, rotación, líneas, puntaje, niveles),
+                 `area: controles` (teclado, pausa, reinicio)
+               - tamaño (uno): size/S o size/M
+               No crees labels nuevos. Si el issue ya tenía labels que ya no aplican,
+               quítalos con `--remove-label`.
             3. Escribe el diagnóstico en español en un archivo y publícalo con
                `gh issue comment ${{ github.event.issue.number }} --edit-last --create-if-none --body-file <archivo>`
                (así una edición del issue actualiza el mismo comentario en vez de duplicarlo).
                Estructura del comentario:
                ## 🩺 Diagnóstico
                - **Resumen** del problema
-               - **Causa probable** (con referencias `archivo:línea`)
+               - **Causa probable**
+               Cada referencia a código debe ser un enlace permanente, con este formato:
+               [`archivo:línea`](https://github.com/${{ github.repository }}/blob/${{ github.sha }}/archivo#Llínea)
+               (rango: `#L10-L20`).
                - **Archivos afectados**
                - **Propuesta de solución** (pasos concretos)
                - **Riesgos / casos borde**
