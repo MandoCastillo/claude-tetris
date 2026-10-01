@@ -1,0 +1,49 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+concurrency:
+  group: issue-triage-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    # en "edited" solo si cambió el título o el cuerpo
+    if: github.event.action == 'opened' || github.event.changes.body || github.event.changes.title
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Repo: ${{ github.repository }}. Issue #${{ github.event.issue.number }}.
+            1. Lee el issue con `gh issue view`. Lee CLAUDE.md y el código relevante (game.js, index.html, style.css).
+            2. Obtén los labels existentes con `gh label list`. Aplica los que correspondan
+               (tipo: bug/enhancement/documentation/question; tamaño: size/S o size/M)
+               con `gh issue edit --add-label`. No crees labels nuevos. Si el issue ya tenía
+               labels que ya no aplican, quítalos con `--remove-label`.
+            3. Escribe el diagnóstico en español en un archivo y publícalo con
+               `gh issue comment ${{ github.event.issue.number }} --edit-last --create-if-none --body-file <archivo>`
+               (así una edición del issue actualiza el mismo comentario en vez de duplicarlo).
+               Estructura del comentario:
+               ## 🩺 Diagnóstico
+               - **Resumen** del problema
+               - **Causa probable** (con referencias `archivo:línea`)
+               - **Archivos afectados**
+               - **Propuesta de solución** (pasos concretos)
+               - **Riesgos / casos borde**
+               - **Labels asignados** y por qué
+            No modifiques código del repositorio ni abras PRs.
+          claude_args: '--allowedTools "Read,Grep,Glob,Write,Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*)"'
