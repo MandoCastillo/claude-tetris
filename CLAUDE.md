@@ -15,7 +15,7 @@ python3 -m http.server 8000     # then http://localhost:8000
 
 ## Architecture
 
-All logic is in `game.js` (single script, global mutable state, `'use strict'`). `index.html` provides the DOM elements it grabs by id at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`) — renaming an id breaks the script.
+All logic is in `game.js` (single script, global mutable state, `'use strict'`). `index.html` provides the DOM elements it grabs by id at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`, `theme-toggle`) — renaming an id breaks the script.
 
 - **Cell values = piece type = color index.** Board cells and piece shape matrices store `0` or `1–7`; that number indexes both `PIECES` and `COLORS`. Adding a piece means adding to both arrays and updating the `* 7` in `randomPiece()`.
 - **Loop**: `init()` → `spawn()` → `requestAnimationFrame(loop)`. `loop` accumulates `dt` into `dropAccum` and drops one row per `dropInterval`; landing goes through `lockPiece()` → `merge()` → `clearLines()` → `spawn()`. `spawn()` colliding on arrival triggers `endGame()`.
