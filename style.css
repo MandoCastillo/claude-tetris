@@ -74,7 +74,8 @@ body {
   gap: 24px;
 }
 
-#theme-toggle {
+#theme-toggle,
+#skin-select {
   background: var(--board-bg);
   color: var(--text);
   border: 1px solid var(--border);
@@ -85,7 +86,8 @@ body {
   cursor: pointer;
 }
 
-#theme-toggle:hover {
+#theme-toggle:hover,
+#skin-select:hover {
   border-color: var(--accent);
 }
 
