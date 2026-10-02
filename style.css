@@ -207,8 +207,14 @@ kbd {
   color: var(--accent);
 }
 
-#restart-btn {
-  margin-top: 8px;
+.overlay:not(.paused) .pause-only {
+  display: none;
+}
+
+#resume-btn,
+#restart-btn,
+#controls-btn {
+  width: 180px;
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
@@ -221,6 +227,40 @@ kbd {
   transition: background 0.15s;
 }
 
-#restart-btn:hover {
+#resume-btn:hover,
+#restart-btn:hover,
+#controls-btn:hover {
   background: var(--accent-hover);
+}
+
+#pause-controls {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#pause-controls[hidden] {
+  display: none;
+}
+
+.start-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+#start-level {
+  background: var(--board-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
 }

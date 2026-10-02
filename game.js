@@ -40,10 +40,17 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggle = document.getElementById('theme-toggle');
+const resumeBtn = document.getElementById('resume-btn');
+const controlsBtn = document.getElementById('controls-btn');
+const pauseControls = document.getElementById('pause-controls');
+const startLevelSel = document.getElementById('start-level');
 
 let gridColor = '#22222e';
 
-let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+let startLevel = 1;
+try { startLevel = Math.min(10, Math.max(1, parseInt(localStorage.getItem('startLevel'), 10) || 1)); } catch (e) {}
+
+let board, current, next, score, lines, level, gameStartLevel, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -109,10 +116,14 @@ function clearLines() {
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
-    level = Math.floor(lines / 10) + 1;
-    dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    level = Math.max(gameStartLevel, Math.floor(lines / 10) + 1);
+    dropInterval = dropIntervalFor(level);
     updateHUD();
   }
+}
+
+function dropIntervalFor(lvl) {
+  return Math.max(100, 1000 - (lvl - 1) * 90);
 }
 
 function ghostY() {
@@ -226,6 +237,7 @@ function endGame() {
   cancelAnimationFrame(animId);
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
+  overlay.classList.remove('paused');
   overlay.classList.remove('hidden');
 }
 
@@ -233,12 +245,17 @@ function togglePause() {
   if (gameOver) return;
   paused = !paused;
   if (!paused) {
+    // suelta el foco del menú para que flechas/Space no lo activen al volver
+    document.activeElement?.blur();
+    overlay.classList.add('hidden');
+    dropAccum = 0;
     lastTime = performance.now();
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
     overlayTitle.textContent = 'PAUSA';
     overlayScore.textContent = '';
+    overlay.classList.add('paused');
     overlay.classList.remove('hidden');
   }
 }
@@ -263,10 +280,10 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  gameStartLevel = level = startLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = dropIntervalFor(level);
   dropAccum = 0;
   lastTime = performance.now();
   next = randomPiece();
@@ -278,7 +295,7 @@ function init() {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
@@ -302,7 +319,25 @@ document.addEventListener('keydown', e => {
   updateHUD();
 });
 
-restartBtn.addEventListener('click', init);
+restartBtn.addEventListener('click', () => {
+  restartBtn.blur();
+  init();
+});
+
+resumeBtn.addEventListener('click', togglePause);
+
+controlsBtn.addEventListener('click', () => {
+  pauseControls.hidden = !pauseControls.hidden;
+  controlsBtn.setAttribute('aria-expanded', String(!pauseControls.hidden));
+});
+
+for (let i = 1; i <= 10; i++) startLevelSel.add(new Option(i, i));
+startLevelSel.value = startLevel;
+startLevelSel.addEventListener('change', () => {
+  startLevel = Number(startLevelSel.value);
+  try { localStorage.setItem('startLevel', startLevel); } catch (e) {}
+  startLevelSel.blur();
+});
 
 function applyTheme(theme) {
   if (theme !== 'light') theme = 'dark';
