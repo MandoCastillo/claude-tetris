@@ -15,16 +15,17 @@ python3 -m http.server 8000     # then http://localhost:8000
 
 ## Architecture
 
-All logic is in `game.js` (single script, global mutable state, `'use strict'`). `index.html` provides the DOM elements it grabs by id at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`, `theme-toggle`) — renaming an id breaks the script.
+All logic is in `game.js` (single script, global mutable state, `'use strict'`). `index.html` provides the DOM elements it grabs by id at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`, `theme-toggle`, plus the records ids `record-entry`, `record-name`, `record-save`, `records`, `records-list`, `records-extra`, `records-reset`) — renaming an id breaks the script.
 
 - **Cell values = piece type = color index.** Board cells and piece shape matrices store `0` or `1–7`; that number indexes both `PIECES` and `COLORS`. Adding a piece means adding to both arrays and updating the `* 7` in `randomPiece()`.
+- **Start screen**: the page loads with `#overlay` visible (title TETRIS, records, "Jugar" button); `gameOver` starts `true` so keys are ignored until `init()` runs from the button.
 - **Loop**: `init()` → `spawn()` → `requestAnimationFrame(loop)`. `loop` accumulates `dt` into `dropAccum` and drops one row per `dropInterval`; landing goes through `lockPiece()` → `merge()` → `clearLines()` → `spawn()`. `spawn()` colliding on arrival triggers `endGame()`.
 - **Rotation**: `rotateCW` (clockwise only) + `tryRotate` wall kicks `[0, -1, 1, -2, 2]` columns. Not SRS.
 - **Scoring/level** live in `clearLines()`: `LINE_SCORES[n] * level`, level = `floor(lines/10)+1`, `dropInterval = max(100, 1000 - (level-1)*90)`. Soft drop +1/row, hard drop +2/row.
-- Pause/game-over reuse one overlay (`#overlay`, toggled via the `hidden` class).
+- Start/pause/game-over reuse one overlay (`#overlay`, toggled via the `hidden` class; inner sections use the `hidden` attribute).
+- **Records**: `localStorage['records']` = `{top:[{name,score,lines}] (max 5), bestCombo, maxLines}`, loaded/validated by `loadRecords()`. `endGame()` updates bestCombo/maxLines and shows the name input if the score enters the top 5; `saveRecord()` inserts it and highlights the row. Combo = consecutive locks clearing ≥1 line (tracked in `clearLines()`). The keydown handler ignores keys while `#record-name` is focused.
 - Canvas size is hardcoded in `index.html` (300×600 = `COLS×BLOCK` × `ROWS×BLOCK`); change it together with `COLS`/`ROWS`/`BLOCK`. The next-piece preview assumes a 4×4 grid of 30px on a 120×120 canvas.
 
 ## Known quirks
 
 - Unpausing doesn't re-add `hidden` to the overlay, so the "PAUSA" overlay stays visible after resuming.
-- When game over is triggered from inside `loop` (gravity lock), `endGame()` cancels the frame but `loop` then schedules a new one, so the loop keeps running after game over.

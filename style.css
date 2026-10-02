@@ -224,3 +224,57 @@ kbd {
 #restart-btn:hover {
   background: var(--accent-hover);
 }
+
+/* ---- Records ---- */
+.record-msg {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+#record-name {
+  background: var(--board-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  width: 140px;
+}
+
+#record-save,
+#records-reset {
+  background: var(--board-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#record-save:hover,
+#records-reset:hover {
+  border-color: var(--accent);
+}
+
+#records-list {
+  margin: 8px 0;
+  padding-left: 20px;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#records-list .highlight {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+#records-extra {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
